@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MapPin, Search, Users, Flame } from "lucide-react";
+import { Search, Users, Flame } from "lucide-react";
 import Image from "next/image";
 
 export default function RadarPage() {
