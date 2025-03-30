@@ -17,8 +17,8 @@ export async function fetchRandomImage(category, width = 640, height = 480) {
    }
 }
 
-
 // Create functions that return promises when called
 export const getProfilePic = () => fetchRandomImage('nature', 200, 200);
 export const getPostPic = () => fetchRandomImage('', 500, (Math.random() * 500) + 500); // random height between 500 and 1000
 export const getCoverPic = () => fetchRandomImage('city', 500, 300);
+export const getStoriesPic = () => fetchRandomImage('', 360, 640);

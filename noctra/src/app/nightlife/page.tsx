@@ -3,7 +3,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Bell, MessageCircle } from "lucide-react";
 import ProtectedPage from "@/components/ProtectedPage"; // Import ProtectedPage
 import { getProfilePic, getPostPic } from '@/utils/auxiliar_functions'
@@ -37,7 +36,7 @@ export default function NightlifePage() {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const generatedPosts = await generateRandomPosts(5);
+      const generatedPosts = await generateRandomPosts(10);
       setPosts(generatedPosts);
     };
 
