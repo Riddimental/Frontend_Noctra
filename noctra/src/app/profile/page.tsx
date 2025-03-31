@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Crown, LogOut, Menu, Edit } from "lucide-react";
+import { Crown, Menu, Edit } from "lucide-react";
 import { getProfile } from "@/api/service";
 
 export default function ProfilePage() {
@@ -37,18 +37,18 @@ export default function ProfilePage() {
     setLoading(true);
 
     getProfile(token)
-      .then((response) => {
-        setProfile(response.data);
-        console.log("Profile fetched:", response.data);
+      .then((data) => {
+        setProfile(data);
+        console.log("Profile loaded");
       })
       .catch((error) => {
-        console.error("Error fetching profile:", error);
-        alert("Error fetching profile");
+        console.error("Error loading profile:", error);
+        alert("Error loading profile");
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [profile]);
+  }, [profile, router]);
 
   const handleLogout = () => {
     localStorage.clear();

@@ -36,21 +36,35 @@ export async function registerUser(username, email, password) {
    }
  }
  
+ //save user profile data in localstorage as a response
+export const saveProfileData = (profileData) => {
+   localStorage.setItem('profileData', JSON.stringify(profileData));
+   console.log('Profile data saved to localstorage');
+};
 
-// Get user profile
+// Get user profile if not found in localstorage as profileData
 export const getProfile = async (access_token) => {
-   try {
-      const response = await api.get('/userprofiles/me/', {
-         headers: {
-            'Authorization': `Token ${access_token}`,
-         },
-      });
-      return response;
-   } catch (error) {
-      console.error('Error fetching profile:', error.response?.data || error.message);
-      throw new Error('Failed to fetch profile');
+   if (localStorage.getItem('profileData')) {
+      console.log('Profile data found in memory');
+      return JSON.parse(localStorage.getItem('profileData'));
+   } else {
+      try {
+         const response = await api.get('/userprofiles/me/', {
+            headers: {
+               'Authorization': `Token ${access_token}`,
+            },
+         });
+         saveProfileData(response.data);
+         console.log('Profile data fetched from api');
+         return response.data;
+      } catch (error) {
+         console.error('Error fetching profile:', error.response?.data || error.message);
+         throw new Error('Failed to fetch profile');
+      }
    }
 };
+
+
 
 // Update user profile
 export const updateProfile = async (access_token, profileData) => {
@@ -60,7 +74,7 @@ export const updateProfile = async (access_token, profileData) => {
             'Authorization': `Token ${access_token}`,
          },
       });
-      return response;
+      return response.data;
    } catch (error) {
       console.error('Error updating profile:', error.response?.data || error.message);
       throw new Error('Failed to update profile');
