@@ -1,48 +1,161 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Switch } from "@/components/ui/switch"; // Assuming you're using a UI lib
+import Image from "next/image";
+import { Switch } from "@/components/ui/switch";
+import { getProfile, getBaseUrl } from "@/api/service";
+import { ArrowLeft, Save } from "lucide-react";
 
 export default function EditProfilePage() {
+  const router = useRouter();
+
+  // State variables
   const [bio, setBio] = useState("");
   const [playlist, setPlaylist] = useState("");
   const [publicProfile, setPublicProfile] = useState(true);
   const [anonymous, setAnonymous] = useState(false);
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [coverPic, setCoverPic] = useState<File | null>(null);
-  const router = useRouter();
+  const [profilePicUrl, setProfilePicUrl] = useState<string>("");
+  const [coverPicUrl, setCoverPicUrl] = useState<string>("");
+  const [hasChanges, setHasChanges] = useState(false); // Track if any field has changed
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setter: Function) => {
+  // Load profile data
+  useEffect(() => {
+    async function fetchProfile() {
+      const token = localStorage.getItem("userToken");
+      if (token) {
+        try {
+          const profile = await getProfile(token);
+          setBio(profile.bio || "");
+          setPlaylist(profile.playlist || "");
+          setPublicProfile(profile.publicProfile ?? true);
+          setAnonymous(profile.anonymous ?? false);
+          setProfilePicUrl(profile.profile_pic_url || "");
+          setCoverPicUrl(profile.cover_pic_url || "");
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+        }
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    setter: Function
+  ) => {
     if (e.target.files && e.target.files[0]) {
       setter(e.target.files[0]);
+      setHasChanges(true); // Mark as changed
     }
   };
 
   const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (e.target.value.length <= 255) {
+    if (e.target.value.length <= 150) {
       setBio(e.target.value);
+      setHasChanges(true); // Mark as changed
     }
+  };
+
+  const baseUrl = getBaseUrl();
+
+  const handleSaveChanges = () => {
+    // Implement save functionality (e.g., API call to update profile)
+    console.log("Saving changes...");
+    setHasChanges(false); // Reset after save
   };
 
   return (
     <div className="min-h-screen p-6 bg-black text-white">
-      <h1 className="text-2xl font-semibold mb-4">Edit Profile</h1>
+      {/* Top Bar */}
+      <div className="flex justify-between items-center mb-4 relative">
+        <ArrowLeft
+          className="w-6 h-6 cursor-pointer absolute left-0"
+          onClick={() => router.push("/profile")} // Navigate back to profile
+        />
+        <h1 className="text-2xl font-semibold absolute left-1/2 transform -translate-x-1/2">
+          Edit Profile
+        </h1>
+        <button
+          className={`flex items-center text-white ${!hasChanges && "opacity-50 cursor-not-allowed"} absolute right-0`}
+          onClick={handleSaveChanges}
+          disabled={!hasChanges}
+        >
+          <Save className="w-6 h-6" />
+          Save
+        </button>
+      </div>
+
 
       {/* Profile Picture Upload */}
-      <div className="mb-4">
+      <div className="mb-4 relative">
         <label className="block text-sm font-medium">Profile Picture</label>
-        <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setProfilePic)} />
+        <div
+          className="w-24 h-24 rounded-full mb-2 relative cursor-pointer"
+          onClick={() => document.getElementById("profilePicInput")?.click()}
+        >
+          {profilePicUrl && (
+            <Image
+              src={`${baseUrl}${profilePicUrl}`}
+              alt="Profile"
+              width={96}
+              height={96}
+              className="w-24 h-24 object-cover rounded-full"
+              priority
+            />
+          )}
+          <div className="absolute inset-0 flex justify-center items-center text-white opacity-50 bg-black rounded-full">
+            Edit
+          </div>
+        </div>
+        <input
+          id="profilePicInput"
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFileChange(e, setProfilePic)}
+          className="hidden"
+        />
       </div>
 
       {/* Cover Picture Upload */}
-      <div className="mb-4">
+      <div className="mb-4 relative">
         <label className="block text-sm font-medium">Cover Picture</label>
-        <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, setCoverPic)} />
+        <div
+          className="w-full h-40 mb-2 relative cursor-pointer"
+          onClick={() => document.getElementById("coverPicInput")?.click()}
+        >
+          {coverPicUrl && (
+            <Image
+              src={`${baseUrl}${coverPicUrl}`}
+              alt="Cover"
+              width={800}
+              height={300}
+              className="w-full h-40 object-cover"
+              priority
+            />
+          )}
+          <div className="absolute inset-0 flex justify-center items-center text-white opacity-50 bg-black">
+            Edit
+          </div>
+        </div>
+        <input
+          id="coverPicInput"
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFileChange(e, setCoverPic)}
+          className="hidden"
+        />
       </div>
 
       {/* Subscribe to VIP */}
-      <button className="p-2 bg-yellow-500 rounded w-full mb-4" onClick={() => router.push("/subscribe")}>Subscribe to VIP</button>
+      <button
+        className="p-2 bg-yellow-500 rounded w-full mb-4"
+        onClick={() => router.push("/subscribe")}
+      >
+        Subscribe to VIP
+      </button>
 
       {/* Edit Bio */}
       <div className="mb-4">
@@ -54,7 +167,11 @@ export default function EditProfilePage() {
             onChange={handleBioChange}
             placeholder="Write something about yourself..."
           />
-          <span className={`absolute bottom-2 right-2 text-xs ${bio.length === 255 ? "text-red-500" : "text-gray-400"}`}>{bio.length}/255</span>
+          <span
+            className={`absolute bottom-2 right-2 text-xs ${bio.length === 150 ? "text-red-500" : "text-gray-400"}`}
+          >
+            {bio.length}/150
+          </span>
         </div>
       </div>
 
@@ -73,23 +190,36 @@ export default function EditProfilePage() {
       {/* Public Profile Toggle */}
       <div className="mb-4 flex justify-between items-center">
         <span>Public Profile</span>
-        <Switch checked={publicProfile} onCheckedChange={() => {
-          setPublicProfile(!publicProfile);
-          console.log(publicProfile ? "Private" : "Public");
-        }} />
+        <Switch
+          checked={publicProfile}
+          onCheckedChange={() => {
+            setPublicProfile(!publicProfile);
+            console.log(publicProfile ? "Private" : "Public");
+            setHasChanges(true);
+          }}
+        />
       </div>
 
       {/* Anonymous Mode Toggle */}
       <div className="mb-4 flex justify-between items-center">
         <span>Go Anonymous</span>
-        <Switch checked={anonymous} onCheckedChange={() => {
-          setAnonymous(!anonymous);
-          console.log(anonymous ? "Sharing" : "Hiding");
-        }} />
+        <Switch
+          checked={anonymous}
+          onCheckedChange={() => {
+            setAnonymous(!anonymous);
+            console.log(anonymous ? "Sharing" : "Hiding");
+            setHasChanges(true);
+          }}
+        />
       </div>
 
       {/* Delete Profile */}
-      <button className="p-2 bg-red-600 rounded w-full" onClick={() => console.log("Profile deleted (implement API call)")}>Delete Profile</button>
+      <button
+        className="p-2 bg-red-600 rounded w-full"
+        onClick={() => console.log("Profile deleted (implement API call)")}
+      >
+        Delete Profile
+      </button>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const BASE_URL = 'http://127.0.0.1:8000/api';
+
 const api = axios.create({
-   baseURL: 'http://127.0.0.1:8000/api/',
+   baseURL: BASE_URL,
    headers: {
       'Content-Type': 'application/json',
    },
@@ -15,27 +17,27 @@ export const getToken = (username, password) => {
    });
 };
 
+export const getBaseUrl = () => {
+   return BASE_URL;
+}
+
 export async function registerUser(username, email, password) {
    try {
-     const response = await fetch("http://127.0.0.1:8000/api/register/", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({ username, email, password }),
+     const response = await api.post('/register/', {
+       username,
+       email,
+       password
      });
- 
-     if (!response.ok) {
-       throw new Error(`Error ${response.status}: ${response.statusText}`);
-     }
- 
-     return await response.json(); // Expecting { token: "...", username: "..." }
+
+     // Return response data directly (Axios does not use response.ok)
+     return response.data;
    } catch (error) {
-     console.error("API Error:", error);
+     console.error("API Error:", error.response?.data || error.message);
      return null;
    }
- }
- 
+}
+
+
  //save user profile data in localstorage as a response
 export const saveProfileData = (profileData) => {
    localStorage.setItem('profileData', JSON.stringify(profileData));
@@ -45,7 +47,7 @@ export const saveProfileData = (profileData) => {
 // Get user profile if not found in localstorage as profileData
 export const getProfile = async (access_token) => {
    if (localStorage.getItem('profileData')) {
-      console.log('Profile data found in memory');
+      console.log('Profile data found in memory:', JSON.parse(localStorage.getItem('profileData')));
       return JSON.parse(localStorage.getItem('profileData'));
    } else {
       try {

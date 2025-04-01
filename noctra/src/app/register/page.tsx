@@ -19,12 +19,12 @@ export default function RegisterPage() {
       return;
     }
   
-    console.log("Submitting registration with:", { username, email, password });
+    //console.log("Submitting registration with:", { username, email, password });
   
     try {
       const response = await registerUser(username, email, password);
   
-      console.log("API Response:", response);
+      //console.log("API Response:", response);
   
       if (response?.token) {
         localStorage.setItem("userToken", response.token);

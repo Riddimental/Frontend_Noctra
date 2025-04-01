@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Crown, Menu, Edit } from "lucide-react";
-import { getProfile } from "@/api/service";
+import { getProfile, getBaseUrl } from "@/api/service";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("posts");
@@ -12,6 +12,7 @@ export default function ProfilePage() {
     username: string;
     cover_pic_url: string;
     profile_pic_url: string;
+    bio: string;
     is_vip: boolean;
     date_of_birth: string;
   } | null>(null);
@@ -56,19 +57,23 @@ export default function ProfilePage() {
     router.push("/auth");
   };
 
+  const handleEdit = () => {
+    router.push("/edit_profile");
+  };
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
   // Prepend base URL to the image paths
-  const baseUrl = "http://127.0.0.1:8000";
+  const baseUrl = getBaseUrl();
 
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Top Bar */}
       <div className="flex justify-between items-center p-4 bg-gray-900 shadow-md z-10">
         {/* Left Side: Edit Icon */}
-        <Edit className="w-6 h-6 cursor-pointer" onClick={() => console.log("Edit clicked")} />
+        <Edit className="w-6 h-6 cursor-pointer" onClick={handleEdit} />
         <h1 className="text-xl font-semibold">Profile</h1>
 
         {/* Right Side: Menu Icon */}
@@ -122,7 +127,7 @@ export default function ProfilePage() {
               alt="Profile Picture"
               width={96}
               height={96}
-              className="rounded-full border-4 border-black"
+              className="w-24 h-24 object-cover rounded-full border-4 border-black"
               priority
             />
           )}
