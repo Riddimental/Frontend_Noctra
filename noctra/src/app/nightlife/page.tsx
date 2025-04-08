@@ -1,14 +1,21 @@
 "use client";
 
-
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Bell, MessageCircle } from "lucide-react";
-import ProtectedPage from "@/components/ProtectedPage"; // Import ProtectedPage
-import { getProfilePic, getPostPic } from '@/utils/auxiliar_functions'
+import ProtectedPage from "@/components/ui/ProtectedPage"; // Import ProtectedPage
+import { getProfilePic, getPostPic } from "@/utils/auxiliar_functions";
+import NotificationDrawer from "@/components/ui/NotificationDrawer"; // Import NotificationDrawer
+import NightlifeTopBar from "@/components/ui/NightLifeTopBar"; // Import the new TopBar component
 
-async function generateRandomPosts(numPosts: number) { 
-  const usernames = ["dj_nightowl", "club_vibes", "partyqueen", "rave_mania", "midnightmoves", "nightlife_ninja"];
+async function generateRandomPosts(numPosts: number) {
+  const usernames = [
+    "dj_nightowl",
+    "club_vibes",
+    "partyqueen",
+    "rave_mania",
+    "midnightmoves",
+    "nightlife_ninja",
+  ];
   const heights = ["h-64", "h-80", "h-96", "h-72"];
 
   const posts = [];
@@ -33,45 +40,52 @@ async function generateRandomPosts(numPosts: number) {
 
 export default function NightlifePage() {
   const [posts, setPosts] = useState([]);
+  const [drawerOpen, setDrawerOpen] = useState(false); // State for Drawer visibility
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const generatedPosts = await generateRandomPosts(10);
+      const generatedPosts = await generateRandomPosts(1);
       setPosts(generatedPosts);
     };
 
     fetchPosts();
   }, []);
 
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
   return (
     <ProtectedPage>
       <div className="relative min-h-screen bg-black text-white">
-        {/* Transparent Top Bar */}
-        <header className="fixed top-0 left-0 w-full flex items-center justify-between px-4 py-3 bg-black/30 backdrop-blur-md z-50">
-          <h1 className="text-2xl font-bold">Night Life</h1>
-          <div className="flex gap-4">
-            <button className="p-2 rounded-full bg-gray-800">
-              <MessageCircle className="w-5 h-5" />
-            </button>
-            <button className="p-2 rounded-full bg-gray-800">
-              <Bell className="w-5 h-5" />
-            </button>
-          </div>
-        </header>
+        {/* Replace with new TopBar */}
+        <NightlifeTopBar onNotificationClick={toggleDrawer} />
+
+        {/* Notification Drawer */}
+        <NotificationDrawer open={drawerOpen} onClose={toggleDrawer} />
 
         {/* Masonry Grid Layout */}
         <main className="mt-16 px-4 columns-3 gap-3 space-y-3">
           {posts.map((post) => (
-            <div key={post.id} className={`relative ${post.height} w-full bg-gray-900 rounded-lg overflow-hidden`}>
+            <div
+              key={post.id}
+              className={`relative ${post.height} w-full bg-gray-900 rounded-lg overflow-hidden`}
+            >
               {/* User Info */}
               <div className="absolute top-2 left-2 flex items-center gap-2 z-10 bg-black/50 p-2 rounded-full">
-                <Image src={post.profilePic || '/default-profile-pic.png'} alt="User" width={30} height={30} className="rounded-full" />
+                <Image
+                  src={post.profilePic || "/default-profile-pic.png"}
+                  alt="User"
+                  width={30}
+                  height={30}
+                  className="rounded-full"
+                />
                 <span className="text-sm">{post.username}</span>
               </div>
 
               {/* Video Post */}
               <video
-                src={post.video || '/default-video.mp4'}
+                src={post.video || "/default-video.mp4"}
                 autoPlay
                 loop
                 muted

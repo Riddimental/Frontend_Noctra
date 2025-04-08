@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
-import { getProfile, getBaseUrl } from "@/api/service";
+import { getProfile, getBaseUrl, updateProfile } from "@/api/service";
 import { ArrowLeft, Save } from "lucide-react";
 
 export default function EditProfilePage() {
@@ -32,8 +32,8 @@ export default function EditProfilePage() {
           setPlaylist(profile.playlist || "");
           setPublicProfile(profile.publicProfile ?? true);
           setAnonymous(profile.anonymous ?? false);
-          setProfilePicUrl(profile.profile_pic_url || "");
-          setCoverPicUrl(profile.cover_pic_url || "");
+          setProfilePicUrl(profile.profile_pic || "");
+          setCoverPicUrl(profile.cover_pic || "");
         } catch (error) {
           console.error("Error fetching profile:", error);
         }
@@ -59,13 +59,37 @@ export default function EditProfilePage() {
     }
   };
 
-  const baseUrl = getBaseUrl();
+  const baseUrl = 'http://127.0.0.1:8000';
 
-  const handleSaveChanges = () => {
-    // Implement save functionality (e.g., API call to update profile)
-    console.log("Saving changes...");
-    setHasChanges(false); // Reset after save
+
+  const handleSaveChanges = async () => {
+    const token = localStorage.getItem("userToken");
+    if (!token) return router.push("/auth");
+  
+    const formData = new FormData();
+    formData.append("bio", bio);
+    formData.append("playlist", playlist);
+    formData.append("publicProfile", publicProfile.toString());
+    formData.append("anonymous", anonymous.toString());
+  
+    if (profilePic) {
+      formData.append("profile_pic", profilePic);
+    }
+  
+    if (coverPic) {
+      formData.append("cover_pic", coverPic);
+    }
+  
+    try {
+      const updatedProfile = await updateProfile(formData, token);
+      console.log("Profile updated:", updatedProfile);
+      setHasChanges(false);
+      router.push("/profile"); // Optional: go back after saving
+    } catch (error: any) {
+      console.error("Error updating profile:", error.message);
+    }
   };
+  
 
   return (
     <div className="min-h-screen p-6 bg-black text-white">

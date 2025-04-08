@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Calendar, Heart, MessageCircle, Ticket, X } from "lucide-react";
-import ProtectedPage from "@/components/ProtectedPage"; // Import ProtectedPage
+import ProtectedPage from "@/components/ui/ProtectedPage"; // Import ProtectedPage
 
 
 const stories = [

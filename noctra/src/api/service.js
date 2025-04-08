@@ -18,15 +18,17 @@ export const getToken = (username, password) => {
 };
 
 export const getBaseUrl = () => {
-   return BASE_URL;
+   //quitale el ultimo slash /api
+   return BASE_URL
 }
 
-export async function registerUser(username, email, password) {
+export async function registerUser(username, email, password, date_of_birth) {
    try {
      const response = await api.post('/register/', {
        username,
        email,
-       password
+       password,
+       date_of_birth
      });
 
      // Return response data directly (Axios does not use response.ok)
@@ -66,22 +68,26 @@ export const getProfile = async (access_token) => {
    }
 };
 
-
-
-// Update user profile
-export const updateProfile = async (access_token, profileData) => {
+//update user profile
+export async function updateProfile(data, token) {
    try {
-      const response = await api.put('/userprofiles/me/', profileData, {
-         headers: {
-            'Authorization': `Token ${access_token}`,
-         },
-      });
-      return response.data;
+     const response = await api.patch("/userprofiles/me/", data, {
+       headers: {
+         Authorization: `Token ${token}`,
+         "Content-Type": "multipart/form-data",
+       },
+     });
+     //remove the stored profile in local sotrage
+     localStorage.removeItem('profileData')
+     return response.data;
    } catch (error) {
-      console.error('Error updating profile:', error.response?.data || error.message);
-      throw new Error('Failed to update profile');
+     if (error.response?.data?.detail) {
+       throw new Error(error.response.data.detail);
+     }
+     throw new Error("Failed to update profile");
    }
-};
+ }
+ 
 
 // Logout user (invalidate token)
 export const logoutUser = async (access_token) => {

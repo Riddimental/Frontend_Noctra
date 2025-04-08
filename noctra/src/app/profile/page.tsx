@@ -3,8 +3,17 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Crown, Menu, Edit } from "lucide-react";
+import { Crown, Edit, LogOut, Settings, LifeBuoy } from "lucide-react";
 import { getProfile, getBaseUrl } from "@/api/service";
+import Box from "@mui/material/Box";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import { Typography } from "@mui/material";
+import { ListItemIcon } from "@mui/material";
+import ProfileTopBar from "@/components/ui/ProfileTopBar"; // Import your custom ProfileTopBar
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("posts");
@@ -18,38 +27,41 @@ export default function ProfilePage() {
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // State to manage the sidebar visibility
+  const [drawerOpen, setDrawerOpen] = useState(false); // State to manage drawer visibility
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("userToken");
-    const username = localStorage.getItem("username");
-
-    if (!token || !username) {
-      router.push("/auth"); // Redirect if not authenticated
-      return;
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("userToken");
+      const username = localStorage.getItem("username");
+  
+      if (!token || !username) {
+        router.push("/auth"); // Redirect if not authenticated
+        return;
+      }
+  
+      if (profile) {
+        setLoading(false); // Skip fetch if profile is already loaded
+        return;
+      }
+  
+      setLoading(true);
+  
+      getProfile(token)
+        .then((data) => {
+          setProfile(data);
+          console.log("Profile loaded");
+        })
+        .catch((error) => {
+          console.error("Error loading profile:", error);
+          alert("Error loading profile");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-
-    if (profile) {
-      setLoading(false); // Skip fetch if profile is already loaded
-      return;
-    }
-
-    setLoading(true);
-
-    getProfile(token)
-      .then((data) => {
-        setProfile(data);
-        console.log("Profile loaded");
-      })
-      .catch((error) => {
-        console.error("Error loading profile:", error);
-        alert("Error loading profile");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
   }, [profile, router]);
+  
 
   const handleLogout = () => {
     localStorage.clear();
@@ -61,46 +73,85 @@ export default function ProfilePage() {
     router.push("/edit_profile");
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+  const toggleDrawer = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
   // Prepend base URL to the image paths
-  const baseUrl = getBaseUrl();
+  const baseUrl = 'http://127.0.0.1:8000';
 
   return (
     <div className="min-h-screen bg-black text-white relative">
-      {/* Top Bar */}
-      <div className="flex justify-between items-center p-4 bg-gray-900 shadow-md z-10">
-        {/* Left Side: Edit Icon */}
-        <Edit className="w-6 h-6 cursor-pointer" onClick={handleEdit} />
-        <h1 className="text-xl font-semibold">Profile</h1>
+      {/* Top Bar: Replace the existing code with ProfileTopBar */}
+      <ProfileTopBar onMenuClick={toggleDrawer} onUploadClick={toggleDrawer} />
 
-        {/* Right Side: Menu Icon */}
-        <Menu className="w-6 h-6 cursor-pointer" onClick={toggleSidebar} />
-      </div>
-
-      {/* Sidebar Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20"
-          onClick={toggleSidebar} // Close sidebar when clicking outside
+      {/* Drawer */}
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={toggleDrawer}
+        sx={{
+          "& .MuiDrawer-paper": {
+            backgroundColor: "#1a202c", // Dark background color
+            color: "#fff", // White text color
+          },
+        }}
+      >
+        <Box
+          sx={{ width: 250 }}
+          role="presentation"
+          onClick={toggleDrawer}
+          onKeyDown={toggleDrawer}
         >
-          <div className="fixed top-0 right-0 w-64 h-full bg-gray-900 p-4">
-            <ul className="space-y-4">
-              <li>
-                <button onClick={handleLogout} className="text-white">Logout</button>
-              </li>
-              <li>
-                <button className="text-white">Settings</button>
-              </li>
-              <li>
-                <button className="text-white">Contact Support</button>
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
+          <List>
+            <ListItem>
+              <Typography
+                variant="h6"
+                sx={{
+                  fontSize: "1.8rem",
+                  fontWeight: "bold",
+                  padding: "10px 0",
+                  textAlign: "center",
+                }}
+              >
+                Noctra
+              </Typography>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleEdit}>
+                <ListItemIcon>
+                  <Edit className="w-6 h-6" style={{ color: "white" }} />
+                </ListItemIcon>
+                <ListItemText primary="Edit Profile" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleLogout}>
+                <ListItemIcon>
+                  <LogOut className="w-6 h-6" style={{ color: "white" }} />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <Settings className="w-6 h-6" style={{ color: "white" }} />
+                </ListItemIcon>
+                <ListItemText primary="Settings" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton>
+                <ListItemIcon>
+                  <LifeBuoy className="w-6 h-6" style={{ color: "white" }} />
+                </ListItemIcon>
+                <ListItemText primary="Contact Support" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </Box>
+      </Drawer>
 
       {/* Cover Photo */}
       <div className="relative">
