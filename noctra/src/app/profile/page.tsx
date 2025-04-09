@@ -3,17 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Crown, Edit, LogOut, Settings, LifeBuoy } from "lucide-react";
-import { getProfile, getBaseUrl } from "@/api/service";
+import { Crown, Edit, LogOut, Settings, LifeBuoy, BriefcaseBusiness } from "lucide-react";
+import { getProfile } from "@/api/service";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import Divider from "@mui/material/Divider";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { Typography } from "@mui/material";
 import { ListItemIcon } from "@mui/material";
-import ProfileTopBar from "@/components/ui/ProfileTopBar"; // Import your custom ProfileTopBar
+import ProfileTopBar from "@/components/ui/ProfileTopBar";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("posts");
@@ -83,7 +84,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Top Bar: Replace the existing code with ProfileTopBar */}
-      <ProfileTopBar onMenuClick={toggleDrawer} onUploadClick={toggleDrawer} />
+      <ProfileTopBar onMenuClick={toggleDrawer}/>
 
       {/* Drawer */}
       <Drawer
@@ -126,11 +127,19 @@ export default function ProfilePage() {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton onClick={handleLogout}>
+              <ListItemButton onClick={() => console.log("click")}>
                 <ListItemIcon>
-                  <LogOut className="w-6 h-6" style={{ color: "white" }} />
+                  <Crown className="w-6 h-6" style={{ color: "white" }} />
                 </ListItemIcon>
-                <ListItemText primary="Logout" />
+                <ListItemText primary="Manage Subscription" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton onClick={() => console.log("click")}>
+                <ListItemIcon>
+                  <BriefcaseBusiness className="w-6 h-6" style={{ color: "white" }} />
+                </ListItemIcon>
+                <ListItemText primary="Bar Manager" />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
@@ -147,6 +156,18 @@ export default function ProfilePage() {
                   <LifeBuoy className="w-6 h-6" style={{ color: "white" }} />
                 </ListItemIcon>
                 <ListItemText primary="Contact Support" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+          <Divider />
+          {/* Logout Button on the bottom of the box*/}
+          <List sx={{ position: "absolute", bottom: 80, width: "100%" }}>
+            <ListItem disablePadding>
+              <ListItemButton onClick={handleLogout}>
+                <ListItemIcon>
+                  <LogOut className="w-6 h-6" style={{ color: "white" }} />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
               </ListItemButton>
             </ListItem>
           </List>

@@ -25,6 +25,11 @@ export default function RadarPage() {
     return () => clearInterval(interval);
   }, []);
 
+  
+  const profile = JSON.parse(localStorage.getItem('profileData'));
+
+  const baseUrl = 'http://127.0.0.1:8000';
+
   return (
     <div className="flex flex-col min-h-screen pb-24"> {/* Prevent overlap */}
       {/* Top Bar */}
@@ -75,11 +80,11 @@ export default function RadarPage() {
           {/* User Profile Picture */}
           <div className="absolute">
             <Image
-              src="/profile-pic.jpg" // Change to dynamic profile picture
+              src={`${baseUrl}${profile.profile_pic}`} // Change to dynamic profile picture
               alt="User Profile"
               width={50}
               height={50}
-              className="rounded-full border-4 border-white"
+              className="rounded-full w-30 h-30 border-4 border-white"
             />
           </div>
         </div>
