@@ -68,6 +68,39 @@ export const getProfile = async (access_token) => {
    }
 };
 
+
+// Function to upload a new post with media files
+export async function uploadPostWithMedia(caption, tags, is_public, files, access_token) {
+   try {
+      const formData = new FormData();
+
+      // Add the necessary metadata (e.g., caption, tags, is_public)
+      formData.append('caption', caption);
+      formData.append('tags', tags); // This assumes you are sending a list of tag IDs as a string or comma-separated list
+      formData.append('is_public', is_public);
+
+      // Append each media file to the FormData object
+      files.forEach(file => {
+         formData.append('media', file);  // Assuming 'media' is the field name for files
+      });
+
+      // Send the POST request to create a new post with media
+      const response = await api.post('/posts/', formData, {
+         headers: {
+            'Authorization': `Token ${access_token}`,
+            'Content-Type': 'multipart/form-data',
+         },
+      });
+
+      console.log('Post and media uploaded successfully:', response.data);
+      return response.data; // This will return the response from the server
+   } catch (error) {
+      console.error('Error uploading post and media:', error.response?.data || error.message);
+      throw new Error('Post and media upload failed');
+   }
+}
+
+
 //update user profile
 export async function updateProfile(data, token) {
    try {

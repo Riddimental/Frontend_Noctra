@@ -184,6 +184,7 @@ export default function ProfilePage() {
             alt="Cover Photo"
             width={800}
             height={300}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="w-full h-40 object-cover"
             priority
           />
@@ -199,6 +200,7 @@ export default function ProfilePage() {
               alt="Profile Picture"
               width={96}
               height={96}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="w-24 h-24 object-cover rounded-full border-4 border-black"
               priority
             />
