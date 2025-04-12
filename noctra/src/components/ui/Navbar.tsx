@@ -8,9 +8,11 @@ import Link from "next/link";
 
 export default function Navbar() {
   const [value, setValue] = React.useState<string>("home");
+  const [isClient, setIsClient] = React.useState<boolean>(false); // State to track if the component is mounted
 
-  // Use useEffect to read from localStorage on component mount
+  // Use useEffect to check if the component is mounted
   React.useEffect(() => {
+    setIsClient(true); // Set to true once mounted
     const storedValue = localStorage.getItem("activeTab");
     if (storedValue) {
       setValue(storedValue); // Set the value from localStorage if it exists
@@ -21,6 +23,10 @@ export default function Navbar() {
     setValue(newValue);
     localStorage.setItem("activeTab", newValue); // Save the selected tab to localStorage
   };
+
+  if (!isClient) {
+    return null; // Prevent rendering the component during SSR
+  }
 
   return (
     <BottomNavigation

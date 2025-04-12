@@ -222,7 +222,7 @@ export default function EditProfilePage() {
       </div>
 
       {/* Delete Button */}
-      <button
+      <button style={{ marginBottom: '70px' }}
         className="w-full py-2 rounded bg-red-600"
         onClick={() => console.log("Delete profile (not yet implemented)")}
       >
