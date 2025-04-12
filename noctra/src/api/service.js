@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const BASE_URL = 'http://127.0.0.1:8000/api';
+const MEDIA_URL = 'http://127.0.0.1:8000';
 
 const api = axios.create({
    baseURL: BASE_URL,
@@ -18,8 +19,11 @@ export const getToken = (username, password) => {
 };
 
 export const getBaseUrl = () => {
-   //quitale el ultimo slash /api
    return BASE_URL
+}
+
+export const getMediaURL = () => {
+   return MEDIA_URL
 }
 
 export async function registerUser(username, email, password, date_of_birth) {
@@ -49,7 +53,7 @@ export const saveProfileData = (profileData) => {
 // Get user profile if not found in localstorage as profileData
 export const getProfile = async (access_token) => {
    if (localStorage.getItem('profileData')) {
-      console.log('Profile data found in memory:', JSON.parse(localStorage.getItem('profileData')));
+      console.log('Profile data found in memory');
       return JSON.parse(localStorage.getItem('profileData'));
    } else {
       try {
@@ -70,36 +74,60 @@ export const getProfile = async (access_token) => {
 
 
 // Function to upload a new post with media files
-export async function uploadPostWithMedia(caption, tags, is_public, files, access_token) {
+export async function uploadPostWithMedia(caption, tags, is_public, files, access_token, original_post_id = null) {
    try {
-      const formData = new FormData();
-
-      // Add the necessary metadata (e.g., caption, tags, is_public)
-      formData.append('caption', caption);
-      formData.append('tags', tags); // This assumes you are sending a list of tag IDs as a string or comma-separated list
-      formData.append('is_public', is_public);
-
-      // Append each media file to the FormData object
-      files.forEach(file => {
-         formData.append('media', file);  // Assuming 'media' is the field name for files
-      });
-
-      // Send the POST request to create a new post with media
-      const response = await api.post('/posts/', formData, {
-         headers: {
-            'Authorization': `Token ${access_token}`,
-            'Content-Type': 'multipart/form-data',
-         },
-      });
-
-      console.log('Post and media uploaded successfully:', response.data);
-      return response.data; // This will return the response from the server
+     const formData = new FormData();
+ 
+     const formattedTags = tags.map(tag =>
+       typeof tag === 'string' ? { name: tag } : tag
+     );
+ 
+     formData.append('caption', caption);
+     formData.append('tags', JSON.stringify(formattedTags));
+     formData.append('is_public', is_public ? 'true' : 'false');
+ 
+     // Append original_post if it's provided (for reposts)
+     if (original_post_id) {
+       formData.append('original_post', original_post_id);
+     }
+ 
+     if (files && files.length > 0) {
+       for (const file of files) {
+         formData.append('media', file);
+       }
+     }
+ 
+     const response = await api.post('/posts/', formData, {
+       headers: {
+         'Authorization': `Token ${access_token}`,
+         'Content-Type': 'multipart/form-data',
+       },
+     });
+ 
+     console.log('✅ Post and media uploaded successfully');
+     return response.data;
    } catch (error) {
-      console.error('Error uploading post and media:', error.response?.data || error.message);
-      throw new Error('Post and media upload failed');
+     console.error('❌ Error uploading post and media:', error.response?.data || error.message);
+     throw new Error('Post and media upload failed');
    }
 }
 
+export async function getPostsByUser(access_token) {
+   try {
+     const response = await api.get('/posts/', {
+       headers: {
+         'Authorization': `Token ${access_token}`,
+       },
+     });
+ 
+     //console.log('✅ User posts:', response.data);
+     return response.data;
+   } catch (error) {
+     console.error('❌ Error fetching user posts:', error.response?.data || error.message);
+     throw new Error('Failed to fetch user posts');
+   }
+ }
+ 
 
 //update user profile
 export async function updateProfile(data, token) {

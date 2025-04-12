@@ -113,7 +113,9 @@ export default function EditProfilePage() {
                 src={`${baseUrl}${profilePicUrl}`}
                 alt="Profile"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
+                priority
               />
             )}
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-xs text-white">
@@ -141,7 +143,9 @@ export default function EditProfilePage() {
                 src={`${baseUrl}${coverPicUrl}`}
                 alt="Cover"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover"
+                priority
               />
             )}
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-sm text-white">

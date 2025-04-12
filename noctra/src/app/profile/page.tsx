@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Crown, Edit, LogOut, Settings, LifeBuoy, BriefcaseBusiness } from "lucide-react";
-import { getProfile } from "@/api/service";
+import { getProfile, getPostsByUser, getMediaURL } from "@/api/service";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -15,6 +15,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { Typography } from "@mui/material";
 import { ListItemIcon } from "@mui/material";
 import ProfileTopBar from "@/components/ui/ProfileTopBar";
+import Post from "@/components/ui/Post"; // Import your Post component
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("posts");
@@ -26,7 +27,8 @@ export default function ProfilePage() {
     is_vip: boolean;
     date_of_birth: string;
   } | null>(null);
-
+  
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false); // State to manage drawer visibility
   const router = useRouter();
@@ -48,6 +50,7 @@ export default function ProfilePage() {
   
       setLoading(true);
   
+      // Fetch Profile Data
       getProfile(token)
         .then((data) => {
           setProfile(data);
@@ -60,9 +63,19 @@ export default function ProfilePage() {
         .finally(() => {
           setLoading(false);
         });
+
+      // Fetch Posts Data
+      getPostsByUser(token) // Assuming getPostsByUser is your API function to fetch posts
+        .then((data) => {
+          setPosts(data);
+          console.log("Posts loaded");
+        })
+        .catch((error) => {
+          console.error("Error loading posts:", error);
+          alert("Error loading posts");
+        });
     }
   }, [profile, router]);
-  
 
   const handleLogout = () => {
     localStorage.clear();
@@ -78,13 +91,19 @@ export default function ProfilePage() {
     setDrawerOpen(!drawerOpen);
   };
 
-  // Prepend base URL to the image paths
-  const baseUrl = 'http://127.0.0.1:8000';
+  const baseUrl = getMediaURL();
 
   return (
     <div className="min-h-screen bg-black text-white relative">
       {/* Top Bar: Replace the existing code with ProfileTopBar */}
-      <ProfileTopBar onMenuClick={toggleDrawer}/>
+      <ProfileTopBar
+        onMenuClick={toggleDrawer}
+        handleActions={{
+          "Add Post": () => router.push("/new_post"),
+          "Add Story": () => console.log("Story upload triggered"),
+          "Add Event": () => console.log("Event upload triggered"),
+        }}
+      />
 
       {/* Drawer */}
       <Drawer
@@ -180,7 +199,7 @@ export default function ProfilePage() {
           <div className="w-full h-40 bg-gray-500"></div>
         ) : (
           <Image
-            src={`${baseUrl}${profile.cover_pic_url}`} // Full URL with base URL
+            src={`${baseUrl}${profile.cover_pic_url}`}
             alt="Cover Photo"
             width={800}
             height={300}
@@ -196,7 +215,7 @@ export default function ProfilePage() {
             <div className="w-24 h-24 bg-gray-500 rounded-full"></div>
           ) : (
             <Image
-              src={`${baseUrl}${profile.profile_pic_url}`} // Full URL with base URL
+              src={`${baseUrl}${profile.profile_pic_url}`}
               alt="Profile Picture"
               width={96}
               height={96}
@@ -240,9 +259,26 @@ export default function ProfilePage() {
         ))}
       </div>
 
-      {/* Content */}
-      <div className="p-6 text-center">
-        {activeTab === "posts" && <p>Posts Section</p>}
+      {/* Posts Section */}
+      <div className="p-6">
+        {activeTab === "posts" && (
+          <div>
+            {loading ? (
+              <p>Loading posts...</p>
+            ) : (
+              posts.map((post: any) => (
+                <Post
+                  key={post.id}
+                  username={post.username}
+                  profilePicture={`${baseUrl}${profile.profile_pic_url}`}
+                  caption={post.caption}
+                  media={post.files}
+                  createdAt={post.created_at}
+                />
+              ))
+            )}
+          </div>
+        )}
         {activeTab === "tagged" && <p>Tagged In Section</p>}
         {activeTab === "more" && <p>More Section</p>}
       </div>
