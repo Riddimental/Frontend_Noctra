@@ -139,7 +139,7 @@ If you encounter any issues during the setup or while running the frontend, here
   npm install
   ```
 
----
+
 
 ## For Frontend Development - Windows, Linux, and macOS Instructions
 
@@ -172,60 +172,53 @@ The setup process is consistent across **Windows**, **Linux**, and **macOS**. Be
    ```
 3. Use **Terminal** to run the setup commands.
 
----
+
 
 ## Screenshots
 
 Below are screenshots of the Noctra frontend UI to give you a visual overview of the user experience:
 
 ### 1. Register Page
-**File**: `screenshots/1 register.png`  
-**Description**: User registration form where new users can create an account by providing a username, email, and password.  
+First register a user providing username, email, date of birth, password and user's agreement
 ![Register Screenshot](./screenshots/1%20register.png)
 
----
+
 
 ### 2. Login Page  
-**File**: `screenshots/2 login.png`  
-**Description**: Secure login screen with fields for email and password. Authenticates the user using JWT.  
+Have access to secure login screen with fields for email and password. Authenticates the user using JWT.  
 ![Login Screenshot](./screenshots/2%20login.png)
 
----
+
 
 ### 3. Profile Home  
-**File**: `screenshots/3 profile home.png`  
-**Description**: The user's profile home showing their avatar, username, bio, and a list of their recent posts.  
+The user is routed to the user's profile home showing their avatar, username, and a list of their recent posts.  
 ![Profile Home Screenshot](./screenshots/3%20profile%20home.png)
 
----
+
 
 ### 4. Add Post  
-**File**: `screenshots/4 add post.png`  
-**Description**: Interface to create a new post, including a caption and the option to upload media like images or videos.  
+Click in "Add Post" to create a new post, including a caption and the option to upload media like images or videos.  
 ![Add Post Screenshot](./screenshots/4%20add%20post.png)
 
----
 
-### 5. Post Options  
-**File**: `screenshots/5 options.png`  
-**Description**: Menu options available for a post, such as editing, deleting, or reporting content.  
+
+### 5. Profile Options  
+Drawer menu with options available for editing the profile info, Manage VIP subscription, Bar manager, App settings, Contact support and Logout.  
 ![Options Screenshot](./screenshots/5%20options.png)
 
----
+
 
 ### 6. Edit Profile  
-**File**: `screenshots/6 edit profile.png`  
-**Description**: Screen for updating user profile information such as display name, bio, and profile picture.  
+Ready for updating user profile information such as display name, bio, or profile picture.  
 ![Edit Profile Screenshot](./screenshots/6%20edit%20profile.png)
 
----
+
 
 ### 7. Night Radar View  
-**File**: `screenshots/7 nigth radar.png`  
-**Description**: A unique nighttime radar-style UI view, part of Noctra's experimental design features.  
+See a unique nighttime radar-style UI view, part of Noctra's experimental design features.  
 ![Night Radar Screenshot](./screenshots/7%20nigth%20radar.png)
 
----
+
 
 ## Backend
 
@@ -235,7 +228,7 @@ The backend for Noctra is available in a separate repository and handles authent
 
 Make sure to set up and run the backend server to enable full functionality of the Noctra platform. Refer to the backend repository's README for detailed installation and configuration instructions.
 
----
+
 
 ## License
 
