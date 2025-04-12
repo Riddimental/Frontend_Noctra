@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Crown, Edit, LogOut, Settings, LifeBuoy, BriefcaseBusiness } from "lucide-react";
-import { getProfile, getPostsByUser, getMediaURL } from "@/api/service";
+import { getProfile, getPostsByUser, getMediaURL} from "@/api/service";
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
@@ -266,16 +266,23 @@ export default function ProfilePage() {
             {loading ? (
               <p>Loading posts...</p>
             ) : (
-              posts.map((post: any) => (
-                <Post
-                  key={post.id}
-                  username={post.username}
-                  profilePicture={`${baseUrl}${profile.profile_pic_url}`}
-                  caption={post.caption}
-                  media={post.files}
-                  createdAt={post.created_at}
-                />
-              ))
+              posts.map((post: any) => {
+                // Extract tag names into a string array
+                const tagNames = post.tags.map((tag: { name: string }) => tag.name);
+
+                return (
+                  <Post
+                    key={post.id}
+                    username={profile?.username}
+                    profilePicture={`${baseUrl}${profile?.profile_pic_url}`}
+                    is_vip={profile?.is_vip}
+                    caption={post.caption}
+                    media={post.files}
+                    tags={tagNames}
+                    createdAt={post.created_at}
+                  />
+                );
+              })
             )}
           </div>
         )}

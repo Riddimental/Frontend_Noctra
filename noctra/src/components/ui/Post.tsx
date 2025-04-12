@@ -1,5 +1,5 @@
 import React from "react";
-import { Edit, Heart, MessageCircle, Share2 } from "lucide-react";
+import { Edit, Heart, MessageCircle, Share2, Crown } from "lucide-react";
 import Image from "next/image"; // Importing the Image component from Next.js
 
 interface PostProps {
@@ -10,7 +10,7 @@ interface PostProps {
   createdAt: string;
 }
 
-const Post: React.FC<PostProps> = ({ username, profilePicture, caption, media }) => {
+const Post: React.FC<PostProps> = ({ username, profilePicture, is_vip, caption, media, tags}) => {
   // Check if media exists and has at least one item
   const mediaUrl = media && media.length > 0 ? URL.createObjectURL(media[0]) : null;
 
@@ -35,11 +35,23 @@ const Post: React.FC<PostProps> = ({ username, profilePicture, caption, media })
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
-        <p className="text-lg font-semibold">{username}</p>
+        <p className="text-lg font-semibold">@{username}</p>
+        {is_vip && <Crown style={{ width: "15px", height: "15px" }}/>}
       </div>
 
       {/* Caption */}
       <p className="text-gray-300 mb-4">{caption}</p>
+
+      {/* Tags as Hashtags */}
+      {tags && tags.length > 0 && (
+        <div className="tags mb-4 text-gray-400">
+          {tags.map((tag, index) => (
+            <span key={index} className="mr-2">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
 
       {/* Media Thumbnail (only if media exists) */}
       {mediaUrl && (

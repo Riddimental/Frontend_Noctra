@@ -72,6 +72,16 @@ export const getProfile = async (access_token) => {
    }
 };
 
+export const getUserBasicInfoByID = async (id) => {
+   try {
+      const response = await api.get(`/userprofiles/${id}/`);
+      return response.data;
+   } catch (error) {
+      console.error('Error fetching user:', error.response?.data || error.message);
+      throw new Error('Failed to fetch user');
+   }
+   
+}
 
 // Function to upload a new post with media files
 export async function uploadPostWithMedia(caption, tags, is_public, files, access_token, original_post_id = null) {
