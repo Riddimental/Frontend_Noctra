@@ -106,6 +106,11 @@ export async function uploadPostWithMedia(caption, tags, is_public, files, acces
          formData.append('media', file);
        }
      }
+
+     //console log the form data youre sending to the api, line by line
+     for (const [key, value] of formData.entries()) {
+       console.log(`${key}: ${value}`);
+     }
  
      const response = await api.post('/posts/', formData, {
        headers: {
