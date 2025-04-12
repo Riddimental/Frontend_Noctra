@@ -97,9 +97,9 @@ export default function NewPostPage() {
             <div className="w-12 h-12 bg-gray-700 rounded-full" />
           )}
         </div>
-        <span className="font-medium text-base flex items-center gap-2">
-          {username}
-          {profileVIP && <Crown />}
+        <span className="font-semibold text-base flex items-center gap-2">
+          @{username}
+          {profileVIP && <Crown style={{ width: "15px", height: "15px" }}/>}
         </span>
       </div>
 
