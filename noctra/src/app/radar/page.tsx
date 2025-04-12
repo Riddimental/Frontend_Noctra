@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MapPin, Search, Users, Flame } from "lucide-react";
+import { Search, Users, Flame } from "lucide-react";
 import Image from "next/image";
 
 export default function RadarPage() {
@@ -24,6 +24,11 @@ export default function RadarPage() {
     }, 3000); // Radar pulse every 3 sec
     return () => clearInterval(interval);
   }, []);
+
+  
+  const profile = JSON.parse(localStorage.getItem('profileData'));
+
+  const baseUrl = 'http://127.0.0.1:8000';
 
   return (
     <div className="flex flex-col min-h-screen pb-24"> {/* Prevent overlap */}
@@ -75,11 +80,11 @@ export default function RadarPage() {
           {/* User Profile Picture */}
           <div className="absolute">
             <Image
-              src="/profile-pic.jpg" // Change to dynamic profile picture
+              src={`${baseUrl}${profile.profile_pic}`} // Change to dynamic profile picture
               alt="User Profile"
               width={50}
               height={50}
-              className="rounded-full border-4 border-white"
+              className="rounded-full w-30 h-30 border-4 border-white"
             />
           </div>
         </div>
