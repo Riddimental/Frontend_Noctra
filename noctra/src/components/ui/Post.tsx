@@ -1,16 +1,17 @@
 import React from "react";
 import { Edit, Heart, MessageCircle, Share2, Crown } from "lucide-react";
-import Image from "next/image"; // Importing the Image component from Next.js
+import Image from "next/image";
+import ProfilePic from "@/components/ui/ProfilePic";
+
 
 interface PostProps {
   username: string;
-  profilePicture: string;
   caption: string;
   media: File[]; // Media is now optional (empty array is valid)
   createdAt: string;
 }
 
-const Post: React.FC<PostProps> = ({ username, profilePicture, is_vip, caption, media, tags}) => {
+const Post: React.FC<PostProps> = ({ username, is_vip, caption, media, tags }) => {
   // Check if media exists and has at least one item
   const mediaUrl = media && media.length > 0 ? URL.createObjectURL(media[0]) : null;
 
@@ -25,16 +26,7 @@ const Post: React.FC<PostProps> = ({ username, profilePicture, is_vip, caption, 
 
       {/* Header: Profile Picture and Username */}
       <div className="flex items-center space-x-3 mb-4">
-        <div className="relative w-12 h-12">
-          <Image
-            src={`${profilePicture}`}
-            alt="Profile"
-            fill
-            style={{ objectFit: "cover" }}
-            className="rounded-full"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
+        <ProfilePic identifier={username} size={48} />
         <p className="text-lg font-semibold">@{username}</p>
         {is_vip && <Crown style={{ width: "15px", height: "15px" }}/>}
       </div>

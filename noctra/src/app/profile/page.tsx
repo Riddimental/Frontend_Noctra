@@ -15,6 +15,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { Typography } from "@mui/material";
 import { ListItemIcon } from "@mui/material";
 import ProfileTopBar from "@/components/ui/ProfileTopBar";
+import ProfilePic from "@/components/ui/ProfilePic"; // adjust the path as needed
 import Post from "@/components/ui/Post"; // Import your Post component
 
 export default function ProfilePage() {
@@ -37,19 +38,19 @@ export default function ProfilePage() {
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("userToken");
       const username = localStorage.getItem("username");
-  
+
       if (!token || !username) {
         router.push("/auth"); // Redirect if not authenticated
         return;
       }
-  
+
       if (profile) {
         setLoading(false); // Skip fetch if profile is already loaded
         return;
       }
-  
+
       setLoading(true);
-  
+
       // Fetch Profile Data
       getProfile(token)
         .then((data) => {
@@ -63,19 +64,31 @@ export default function ProfilePage() {
         .finally(() => {
           setLoading(false);
         });
-
-      // Fetch Posts Data
-      getPostsByUser(token) // Assuming getPostsByUser is your API function to fetch posts
-        .then((data) => {
-          setPosts(data);
-          console.log("Posts loaded");
-        })
-        .catch((error) => {
-          console.error("Error loading posts:", error);
-          alert("Error loading posts");
-        });
     }
   }, [profile, router]);
+
+  // Effect to load posts data
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("userToken");
+
+      if (token) {
+        setLoading(true);
+        getPostsByUser(token)
+          .then((data) => {
+            setPosts(data);
+            console.log("Posts loaded");
+          })
+          .catch((error) => {
+            console.error("Error loading posts:", error);
+            alert("Error loading posts");
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.clear();
@@ -211,19 +224,7 @@ export default function ProfilePage() {
 
         {/* Profile Picture */}
         <div className="absolute bottom-[-40px] left-1/2 transform -translate-x-1/2">
-          {loading || !profile?.profile_pic_url ? (
-            <div className="w-24 h-24 bg-gray-500 rounded-full"></div>
-          ) : (
-            <Image
-              src={`${baseUrl}${profile.profile_pic_url}`}
-              alt="Profile Picture"
-              width={96}
-              height={96}
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className="w-24 h-24 object-cover rounded-full border-4 border-black"
-              priority
-            />
-          )}
+          <ProfilePic identifier={profile?.username} size={96}/>
         </div>
       </div>
 
@@ -274,7 +275,6 @@ export default function ProfilePage() {
                   <Post
                     key={post.id}
                     username={profile?.username}
-                    profilePicture={`${baseUrl}${profile?.profile_pic_url}`}
                     is_vip={profile?.is_vip}
                     caption={post.caption}
                     media={post.files}

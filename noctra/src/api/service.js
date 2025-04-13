@@ -72,16 +72,31 @@ export const getProfile = async (access_token) => {
    }
 };
 
-export const getUserBasicInfoByID = async (id) => {
-   try {
-      const response = await api.get(`/userprofiles/${id}/`);
-      return response.data;
-   } catch (error) {
-      console.error('Error fetching user:', error.response?.data || error.message);
-      throw new Error('Failed to fetch user');
-   }
-   
-}
+export const getUserBasicInfo = async (identifier, access_token) => {
+  const cacheKey = `user_basic_info_${identifier}`;
+  
+  if (localStorage.getItem(cacheKey)) {
+     //console.log(`Basic info of ${identifier} found in memory`);
+     return JSON.parse(localStorage.getItem(cacheKey));
+  }
+
+  try {
+     const response = await api.get(`/userprofiles/${identifier}/`, {
+        headers: {
+           'Authorization': `Token ${access_token}`,
+        },
+     });
+
+     localStorage.setItem(cacheKey, JSON.stringify(response.data));
+     //console.log('Basic info of user fetched from API');
+     return response.data;
+  } catch (error) {
+     console.error('Error fetching user:', error.response?.data || error.message);
+     throw new Error('Failed to fetch user');
+  }
+};
+
+ 
 
 // Function to upload a new post with media files
 export async function uploadPostWithMedia(caption, tags, is_public, files, access_token, original_post_id = null) {
