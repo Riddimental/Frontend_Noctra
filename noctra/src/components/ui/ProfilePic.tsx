@@ -11,7 +11,7 @@ const ProfilePic: React.FC<ProfilePicProps> = ({ identifier, size = 48 }) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null); // State to hold the token
   const baseUrl = getMediaURL();
-  const borderSize = 96*4/size;
+  const borderSize = Math.floor(96 * 4 / size);
 
   useEffect(() => {
     // Ensure this code runs only on the client side

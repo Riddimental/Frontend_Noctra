@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Switch } from "@/components/ui/switch";
 import { getProfile, updateProfile } from "@/api/service";
 import { ArrowLeft, Save } from "lucide-react";
+import ClubCreationDrawer from "@/components/ui/ClubCreationDrawer";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -19,6 +20,9 @@ export default function EditProfilePage() {
   const [profilePicUrl, setProfilePicUrl] = useState<string>("");
   const [coverPicUrl, setCoverPicUrl] = useState<string>("");
   const [hasChanges, setHasChanges] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+
 
   const baseUrl = "http://127.0.0.1:8000";
 
@@ -75,22 +79,19 @@ export default function EditProfilePage() {
       await updateProfile(formData, token);
       setHasChanges(false);
       router.push("/profile");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error updating profile:", error.message);
     }
   };
 
   return (
-    <div className="min-h-screen px-4 py-6 bg-black text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-6">
-        <ArrowLeft
-          className="w-6 h-6 cursor-pointer"
-          onClick={() => router.push("/profile")}
-        />
-        <h1 className="text-xl font-bold flex-1 text-center">Edit Profile</h1>
+      <div className="sticky top-0 bg-black z-10 px-4 py-4 border-b border-gray-800 flex justify-between items-center">
+        <ArrowLeft className="w-6 h-6 cursor-pointer" onClick={() => router.push("/profile")} />
+        <h1 className="text-lg font-semibold text-center flex-1">Edit Profile</h1>
         <button
-          className={`flex items-center gap-1 text-sm ${!hasChanges ? "opacity-50 cursor-not-allowed" : ""}`}
+          className={`flex items-center gap-1 text-sm ${!hasChanges ? "opacity-40 cursor-not-allowed" : "text-yellow-400"}`}
           onClick={handleSaveChanges}
           disabled={!hasChanges}
         >
@@ -99,135 +100,109 @@ export default function EditProfilePage() {
         </button>
       </div>
 
-      {/* Images */}
-      <div className="space-y-6 mb-6">
-        {/* Profile Pic */}
-        <div>
-          <label className="block text-sm mb-2">Profile Picture</label>
-          <div
-            className="relative w-24 h-24 rounded-full overflow-hidden cursor-pointer"
-            onClick={() => document.getElementById("profilePicInput")?.click()}
-          >
-            {profilePicUrl && (
-              <Image
-                src={`${baseUrl}${profilePicUrl}`}
-                alt="Profile"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover"
-                priority
-              />
-            )}
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-xs text-white">
-              Edit
-            </div>
-          </div>
-          <input
-            id="profilePicInput"
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, setProfilePic)}
-            className="hidden"
-          />
-        </div>
-
-        {/* Cover Pic */}
-        <div>
-          <label className="block text-sm mb-2">Cover Picture</label>
-          <div
-            className="relative w-full h-40 rounded-md overflow-hidden cursor-pointer"
-            onClick={() => document.getElementById("coverPicInput")?.click()}
-          >
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-8">
+        {/* Profile Header */}
+        <div className="space-y-4">
+          {/* Cover */}
+          <div className="relative w-full h-40 rounded-lg overflow-hidden cursor-pointer" onClick={() => document.getElementById("coverPicInput")?.click()}>
             {coverPicUrl && (
-              <Image
-                src={`${baseUrl}${coverPicUrl}`}
-                alt="Cover"
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover"
-                priority
-              />
+              <Image src={`${baseUrl}${coverPicUrl}`} alt="Cover" fill className="object-cover" />
             )}
-            <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-sm text-white">
-              Edit
-            </div>
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-sm">Edit Cover</div>
+            <input id="coverPicInput" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, setCoverPic)} />
           </div>
-          <input
-            id="coverPicInput"
-            type="file"
-            accept="image/*"
-            onChange={(e) => handleFileChange(e, setCoverPic)}
-            className="hidden"
-          />
+
+          {/* Profile Picture */}
+          <div className="flex justify-center">
+            <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-white cursor-pointer" onClick={() => document.getElementById("profilePicInput")?.click()}>
+              {profilePicUrl && (
+                <Image src={`${baseUrl}${profilePicUrl}`} alt="Profile" fill className="object-cover" />
+              )}
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-xs">Edit</div>
+            </div>
+            <input id="profilePicInput" type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, setProfilePic)} />
+          </div>
+        </div>
+
+        {/* Info Fields */}
+        <div className="space-y-4">
+          {/* Bio */}
+          <div>
+            <label className="block text-sm mb-1">Bio</label>
+            <textarea
+              value={bio}
+              onChange={handleBioChange}
+              placeholder="Write something about yourself..."
+              className="w-full p-3 rounded-md bg-gray-800 border border-gray-700 resize-none"
+            />
+            <div className="text-xs text-right mt-1 text-gray-400">{bio.length}/150</div>
+          </div>
+
+          {/* Playlist */}
+          <div>
+            <label className="block text-sm mb-1">Playlist (Spotify URL)</label>
+            <input
+              type="url"
+              value={playlist}
+              onChange={(e) => {
+                setPlaylist(e.target.value);
+                setHasChanges(true);
+              }}
+              placeholder="https://open.spotify.com/..."
+              className="w-full p-3 rounded-md bg-gray-800 border border-gray-700"
+            />
+          </div>
+        </div>
+
+        {/* Toggles */}
+        <div className="border-t border-gray-800 pt-6 space-y-4">
+          <div className="flex justify-between items-center ">
+            <span>Public Profile</span>
+            <Switch
+              checked={publicProfile}
+              onCheckedChange={() => {
+                setPublicProfile(!publicProfile);
+                setHasChanges(true);
+              }}
+            />
+          </div>
+          <div className="flex justify-between items-center">
+            <span>Go Anonymous</span>
+            <Switch
+              checked={anonymous}
+              onCheckedChange={() => {
+                setAnonymous(!anonymous);
+                setHasChanges(true);
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="max-w-[300px] mx-auto space-y-3 pt-6" style={{ marginBottom: '70px' }}>
+          <button
+            onClick={() => router.push("/subscribe")}
+            className="w-full py-3 rounded bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+          >
+            Subscribe to VIP
+          </button>
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="w-full py-3 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+          >
+            Request Club Management
+          </button>
+          <ClubCreationDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
+          <button
+            className="w-full py-3 rounded bg-red-600 hover:bg-red-700 text-white font-semibold"
+            onClick={() => console.log("Delete profile (not yet implemented)")}
+          >
+            Delete Account
+          </button>
         </div>
       </div>
-
-      {/* VIP Button */}
-      <button
-        onClick={() => router.push("/subscribe")}
-        className="w-full mb-6 py-2 rounded bg-yellow-500 text-black font-semibold"
-      >
-        Subscribe to VIP
-      </button>
-
-      {/* Bio */}
-      <div className="mb-4">
-        <label className="block text-sm mb-1">Bio</label>
-        <textarea
-          value={bio}
-          onChange={handleBioChange}
-          placeholder="Write something about yourself..."
-          className="w-full p-2 rounded bg-gray-800 border border-gray-600 resize-none"
-        />
-        <div className="text-xs text-right mt-1 text-gray-400">{bio.length}/150</div>
-      </div>
-
-      {/* Playlist */}
-      <div className="mb-4">
-        <label className="block text-sm mb-1">Playlist (Spotify URL)</label>
-        <input
-          type="url"
-          value={playlist}
-          onChange={(e) => {
-            setPlaylist(e.target.value);
-            setHasChanges(true);
-          }}
-          placeholder="https://open.spotify.com/..."
-          className="w-full p-2 rounded bg-gray-800 border border-gray-600"
-        />
-      </div>
-
-      {/* Toggles */}
-      <div className="space-y-4 mb-6">
-        <div className="flex justify-between items-center">
-          <span>Public Profile</span>
-          <Switch
-            checked={publicProfile}
-            onCheckedChange={() => {
-              setPublicProfile(!publicProfile);
-              setHasChanges(true);
-            }}
-          />
-        </div>
-        <div className="flex justify-between items-center">
-          <span>Go Anonymous</span>
-          <Switch
-            checked={anonymous}
-            onCheckedChange={() => {
-              setAnonymous(!anonymous);
-              setHasChanges(true);
-            }}
-          />
-        </div>
-      </div>
-
-      {/* Delete Button */}
-      <button style={{ marginBottom: '70px' }}
-        className="w-full py-2 rounded bg-red-600"
-        onClick={() => console.log("Delete profile (not yet implemented)")}
-      >
-        Delete Profile
-      </button>
     </div>
+
   );
 }

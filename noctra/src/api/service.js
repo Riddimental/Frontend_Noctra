@@ -53,7 +53,7 @@ export const saveProfileData = (profileData) => {
 // Get user profile if not found in localstorage as profileData
 export const getProfile = async (access_token) => {
    if (localStorage.getItem('profileData')) {
-      console.log('Profile data found in memory');
+      console.log('Profile data found in memory', JSON.parse(localStorage.getItem('profileData')));
       return JSON.parse(localStorage.getItem('profileData'));
    } else {
       try {
@@ -63,7 +63,7 @@ export const getProfile = async (access_token) => {
             },
          });
          saveProfileData(response.data);
-         console.log('Profile data fetched from api');
+         console.log('Profile data fetched from api', response.data);
          return response.data;
       } catch (error) {
          console.error('Error fetching profile:', error.response?.data || error.message);
@@ -76,7 +76,7 @@ export const getUserBasicInfo = async (identifier, access_token) => {
   const cacheKey = `user_basic_info_${identifier}`;
   
   if (localStorage.getItem(cacheKey)) {
-     //console.log(`Basic info of ${identifier} found in memory`);
+     console.log(`Basic info of ${identifier} found in memory`, JSON.parse(localStorage.getItem(cacheKey)));
      return JSON.parse(localStorage.getItem(cacheKey));
   }
 
@@ -88,7 +88,7 @@ export const getUserBasicInfo = async (identifier, access_token) => {
      });
 
      localStorage.setItem(cacheKey, JSON.stringify(response.data));
-     //console.log('Basic info of user fetched from API');
+     console.log('Basic info of user fetched from API', response.data);
      return response.data;
   } catch (error) {
      console.error('Error fetching user:', error.response?.data || error.message);

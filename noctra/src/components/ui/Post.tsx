@@ -16,7 +16,7 @@ const Post: React.FC<PostProps> = ({ username, is_vip, caption, media, tags }) =
   const mediaUrl = media && media.length > 0 ? URL.createObjectURL(media[0]) : null;
 
   return (
-    <div className="post-container bg-gray-900  text-white shadow-md rounded-lg p-4 mb-6 relative">
+    <div className="max-w-md mx-auto post-container bg-gray-900  text-white shadow-md rounded-lg p-4 mb-6 relative">
       {/* Edit icon button */}
       <div className="edit-icon absolute top-2 right-2">
         <button className="p-2 rounded-full bg-gray-600 hover:bg-gray-700 transition duration-150 ease-in-out">
