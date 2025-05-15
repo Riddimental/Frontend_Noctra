@@ -5,14 +5,17 @@ import {
   Modal,
   Box,
   Typography,
-  TextField,
   Button,
   IconButton,
   Stack,
   Backdrop,
   Slide,
+  Input,
+  InputLabel,
+  FormControl,
 } from "@mui/material";
 import { X } from "lucide-react";
+import { registerClub } from "@/api/service";
 
 export default function ClubCreationDrawer({
   open,
@@ -23,36 +26,34 @@ export default function ClubCreationDrawer({
 }) {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
+  const [address, setAddress] = useState("");
   const [contact, setContact] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const handleClose = () => {
+    setName("");
+    setLocation("");
+    setAddress("");
+    setContact("");
+    setDescription("");
+    onClose();
+  };
+
   const handleSubmit = async () => {
+    if (!name || !location || !contact || !description) {
+      alert("Please fill out all required fields");
+      return;
+    }
     setIsSubmitting(true);
     const token = localStorage.getItem("userToken");
 
     try {
-      const res = await fetch("/api/clubs/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name,
-          main_location: location,
-          contact_number: contact,
-          description,
-        }),
-      });
+      const res = await registerClub(name, location, address, contact, description, token)
 
       if (!res.ok) throw new Error("Error creating club");
 
-      setName("");
-      setLocation("");
-      setContact("");
-      setDescription("");
-      onClose();
+      handleClose();
     } catch (err) {
       console.error("Submission error:", err);
     } finally {
@@ -63,7 +64,7 @@ export default function ClubCreationDrawer({
   return (
     <Modal
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
       slotProps={{
@@ -102,53 +103,72 @@ export default function ClubCreationDrawer({
               <Typography variant="h6" color="white">
                 Create New Club
               </Typography>
-              <IconButton onClick={onClose}>
+              <IconButton onClick={handleClose}>
                 <X size={20} color="white" />
               </IconButton>
             </Stack>
 
             <Stack spacing={2}>
-              <TextField
-                fullWidth
-                label="Club Name"
-                variant="outlined"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                InputLabelProps={{ style: { color: "#ccc" } }}
-                InputProps={{ style: { color: "white" } }}
-              />
-              <TextField
-                fullWidth
-                label="Main Location"
-                variant="outlined"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                InputLabelProps={{ style: { color: "#ccc" } }}
-                InputProps={{ style: { color: "white" } }}
-              />
-              <TextField
-                fullWidth
-                label="Contact Number"
-                variant="outlined"
-                value={contact}
-                onChange={(e) => setContact(e.target.value)}
-                InputLabelProps={{ style: { color: "#ccc" } }}
-                InputProps={{ style: { color: "white" } }}
-              />
-              <TextField
-                fullWidth
-                label="Description"
-                variant="outlined"
-                multiline
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                InputLabelProps={{ style: { color: "#ccc" } }}
-                InputProps={{ style: { color: "white" } }}
-              />
+              <FormControl required>
+                <InputLabel sx={{ color: "#ccc" }} htmlFor="club-name">
+                  Club Name
+                </InputLabel>
+                <Input
+                  id="club-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  sx={{ color: "white" }}
+                />
+              </FormControl>
+              <FormControl required>
+                <InputLabel sx={{ color: "#ccc" }} htmlFor="company-main-location">
+                  Company Main Location
+                </InputLabel>
+                <Input
+                  id="company-main-location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  sx={{ color: "white" }}
+                />
+              </FormControl>
+              <FormControl required>
+                <InputLabel sx={{ color: "#ccc" }} htmlFor="address">
+                  Address
+                </InputLabel>
+                <Input
+                  id="address"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  sx={{ color: "white" }}
+                />
+              </FormControl>
+              <FormControl required>
+                <InputLabel sx={{ color: "#ccc" }} htmlFor="contact-number">
+                  Contact Number
+                </InputLabel>
+                <Input
+                  id="contact-number"
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                  sx={{ color: "white" }}
+                />
+              </FormControl>
+              <FormControl>
+                <InputLabel sx={{ color: "#ccc" }} htmlFor="description">
+                  Description
+                </InputLabel>
+                <Input
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  sx={{ color: "white" }}
+                  multiline
+                  rows={3}
+                />
+              </FormControl>
 
               <Stack direction="row" justifyContent="flex-end" spacing={2} pt={2}>
-                <Button onClick={onClose} variant="outlined" color="secondary">
+                <Button onClick={handleClose} variant="outlined" color="secondary">
                   Cancel
                 </Button>
                 <Button
@@ -165,6 +185,6 @@ export default function ClubCreationDrawer({
         </Slide>
       </Box>
     </Modal>
-
   );
 }
+

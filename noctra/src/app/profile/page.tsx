@@ -211,15 +211,17 @@ export default function ProfilePage() {
         {loading || !profile?.cover_pic_url ? (
           <div className="w-full h-40 bg-gray-500"></div>
         ) : (
-          <Image
-            src={`${baseUrl}${profile.cover_pic_url}`}
-            alt="Cover Photo"
-            width={800}
-            height={300}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="w-full h-40 object-cover"
-            priority
-          />
+          <div className="relative w-full h-40 overflow-hidden">
+            <Image
+              src={`${baseUrl}${profile.cover_pic_url}`}
+              alt="Cover Photo"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover"
+              priority
+            />
+            <div className="absolute bottom-0 w-full h-16 bg-gradient-to-t from-black to-transparent"></div>
+          </div>
         )}
 
         {/* Profile Picture */}

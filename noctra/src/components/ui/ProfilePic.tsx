@@ -11,7 +11,8 @@ const ProfilePic: React.FC<ProfilePicProps> = ({ identifier, size = 48 }) => {
   const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null); // State to hold the token
   const baseUrl = getMediaURL();
-  const borderSize = Math.floor(96 * 4 / size);
+  //border is 10% of the size
+  const borderSize = size * 0.05;
 
   useEffect(() => {
     // Ensure this code runs only on the client side
@@ -53,8 +54,8 @@ const ProfilePic: React.FC<ProfilePicProps> = ({ identifier, size = 48 }) => {
         src={profilePicUrl}
         alt="User's profile picture"
         fill
-        className={`w-24 h-24 object-cover rounded-full border-${borderSize} border-black`} // Dynamically set the border size
-        style={{ objectFit: "cover" }}
+        className="w-24 h-24 object-cover rounded-full border-black"
+        style={{ objectFit: "cover", borderWidth: borderSize }}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
       />
     </div>

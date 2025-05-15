@@ -191,7 +191,7 @@ export default function EditProfilePage() {
             onClick={() => setIsDrawerOpen(true)}
             className="w-full py-3 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
           >
-            Request Club Management
+            Create Club
           </button>
           <ClubCreationDrawer open={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
           <button

@@ -73,12 +73,14 @@ export const getProfile = async (access_token) => {
 };
 
 export const getUserBasicInfo = async (identifier, access_token) => {
-  const cacheKey = `user_basic_info_${identifier}`;
-  
+  const cacheKey = `basic_info_${identifier}`;
+  console.log('Cache key:', cacheKey);
+
   if (localStorage.getItem(cacheKey)) {
-     console.log(`Basic info of ${identifier} found in memory`, JSON.parse(localStorage.getItem(cacheKey)));
+     console.log('Basic info of user fetched from memory', JSON.parse(localStorage.getItem(cacheKey)));
      return JSON.parse(localStorage.getItem(cacheKey));
   }
+
 
   try {
      const response = await api.get(`/userprofiles/${identifier}/`, {
@@ -150,7 +152,6 @@ export async function getPostsByUser(access_token) {
        },
      });
  
-     //console.log('✅ User posts:', response.data);
      return response.data;
    } catch (error) {
      console.error('❌ Error fetching user posts:', error.response?.data || error.message);
@@ -158,6 +159,27 @@ export async function getPostsByUser(access_token) {
    }
  }
  
+export async function registerClub(name, location, address, contact, description, token) {
+  try {
+    const data = new FormData();
+    data.append('name', name);
+    data.append('company_main_location', location);
+    data.append('address', address);
+    data.append('contact_number', contact);
+    data.append('description', description);
+    const response = await api.post("/create_club/", data, {
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Club creation error:", error.response?.data || error.message);
+    return null;
+  }
+}
 
 //update user profile
 export async function updateProfile(data, token) {
